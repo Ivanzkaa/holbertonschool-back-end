@@ -32,3 +32,6 @@ if __name__ == "__main__":
 
     print("Employee {} is done with tasks({}/{}):".format(EMPLOYEE_NAME,
                                                           TOTAL_NUMBER_OF_TASKS, NUMBER_OF_DONE_TASKS))
+
+    for i in tasks:
+        print("\t {}".format(i))
