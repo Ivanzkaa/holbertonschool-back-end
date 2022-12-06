@@ -8,30 +8,16 @@ from sys import argv
 
 
 if __name__ == "__main__":
-    """returning the infromation about the employees"""
-    EMPLOYEE_NAME = ""
-    NUMBER_OF_DONE_TASKS = 0
-    TOTAL_NUMBER_OF_TASKS = 0
-    tasks = []
-    todo = get('https://jsonplaceholder.typicode.com/todos/')
-    user = get('https://jsonplaceholder.typicode.com/user/')
-    data = todo.json()
-    data_2 = user.json()
+    employee_data = int(argv[1])
+    user = get('https://jsonplaceholder.typicode.com/users/{}'.format(employee_data)).json()
+    todo = get('https://jsonplaceholder.typicode.com/todos?userId={}'.format(employee_data)).json()
 
-    for name_info in data_2:
-        if name_info.get('id') == int(argv[1]):
-            EMPLOYEE_NAME = name_info.get('name')
+    tasks_done = []
+    for task in todo:
+        if task.get('completed') is True:
+            tasks_done.append(task.get('title'))
 
-    for id_info in data:
-        if id_info.get('userId') == int(argv[1]):
-            TOTAL_NUMBER_OF_TASKS += 1
+    print("Employee {} is done with tasks({}/{}):".format(user.get('name'), len(tasks_done), len (todo)))
 
-        if id_info.get('completed') is True:
-            NUMBER_OF_DONE_TASKS += 1
-            tasks.append(id_info.get('title'))
-
-    print("Employee {} is done with tasks({}/{}):".format(EMPLOYEE_NAME,
-                                                          TOTAL_NUMBER_OF_TASKS, NUMBER_OF_DONE_TASKS))
-
-    for i in tasks:
-        print("\t {}".format(i))
+    for done in tasks_done:
+        print("\t {}".format(done))
