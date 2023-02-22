@@ -1,26 +1,40 @@
 #!/usr/bin/python3
-""" extend your Python script to export data in the CSV format """
-
+"""api"""
 import requests
-from sys import argv
+import sys
 
-def csv_format():
-    """exports data in csv format"""
-    
-    u_id = argv[1]
-    api_url = "https://jsonplaceholder.typicode.com/users/{}".format(u_id)
-    api_url2 = "https://jsonplaceholder.typicode.com/todos?userId={}"\
-        .format(u_id)
-    response = requests.get(api_url).json()
-    EMPLOYEE_NAME = response.get('username')
-    response = requests.get(api_url2).json()
-    f_name = u_id + '.csv'
-    with open(f_name, 'w', encoding='utf-8') as f:
-        for info in response:
-            TASK_COMPLETED_STATUS = info.get("completed")
-            TASK_TITLE = info.get("title")
-            f.write('"{}","{}","{}","{}"\n'.format(
-                u_id, EMPLOYEE_NAME, TASK_COMPLETED_STATUS, TASK_TITLE))
 
-if __name__ == '__main__':
-    csv_format()
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        id = int(sys.argv[1])
+
+    url = "https://jsonplaceholder.typicode.com/"
+    employee_name = ""
+
+    try:
+        response_users = requests.request("GET", "{}users/{}".format(url, id))
+        response_tasks = requests.request("GET", "{}todos/".format(url))
+        employee_name = response_users.json()["username"]
+
+    except KeyError:
+        pass
+
+    total_number_of_tasks = len(response_tasks.json())
+with open('{}.csv'.format(id), 'w') as f:
+    try:
+        for i in range(total_number_of_tasks):
+            if response_tasks.json()[i]['userId'] == id:
+
+                f.write(
+                    '"{}",'.format(id) +
+                    '"{}",'.format(employee_name) +
+                    '"{}",'.format(
+                        response_tasks.json()[i]['completed']) +
+                    '"{}"'.format(
+                        response_tasks.json()[i]['title'])
+
+
+                )
+                f.write('\n')
+    except NameError:
+        pass
