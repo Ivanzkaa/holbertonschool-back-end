@@ -1,27 +1,24 @@
 #!/usr/bin/python3
-"""wrting  a python api script"""
-
-
-import json
-from requests import get
-from sys import argv
+""" extend your Python script to export info in the JSON format """
 
 
 if __name__ == "__main__":
-    url = 'https://jsonplaceholder.typicode.com/'
-    user_id = argv[1]
-    users = get('{}users/{}'.format(url, user_id)).json()
-    username = users.get('username')
-    tasks = get('{}todo?userId={}'.format(url, user_id)).json()
+    import json
+    import requests
+    from sys import argv
 
-    list_of_task = []
-    for task in tasks:
-        task_dict = {"task": task['title'],
-                     "completed": task['completed'],
-                     "username": username}
-
-        list_of_task.append(task_dict)
-        data = {str(user_id): list_of_task}
-        filename = '{}.json'.format(user_id)
-        with open(filename, 'w') as file:
-            json.dump(data, file)
+    u_id = argv[1]
+    api_url = "https://jsonplaceholder.typicode.com/users/{}".format(u_id)
+    api_url2 = "https://jsonplaceholder.typicode.com/todos?userId={}"\
+        .format(u_id)
+    response = requests.get(api_url).json()
+    EMPLOYEE_NAME = response.get('username')
+    response = requests.get(api_url2).json()
+    f_name = u_id + '.json'
+    u_list = {u_id: []}
+    for info in response:
+        dic = {"task": info.get('title'), "completed": info.get('completed'),
+               "username": EMPLOYEE_NAME}
+        u_list.get(u_id).append(dic)
+    with open(f_name, 'w', encoding='utf-8') as f:
+        json.dump(u_list, f)

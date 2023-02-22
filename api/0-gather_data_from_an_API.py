@@ -1,23 +1,44 @@
 #!/usr/bin/python3
-"""writing a script using restapi
-for information about emplyees"""
-
-
-from requests import get
+"""Gather data from an API"""
+import requests
 from sys import argv
 
 
-if __name__ == "__main__":
-    employee_data = int(argv[1])
-    user = get('https://jsonplaceholder.typicode.com/users/{}'.format(employee_data)).json()
-    todo = get('https://jsonplaceholder.typicode.com/todos?userId={}'.format(employee_data)).json()
+def information_employee():
+    """returns information about employees"""
+    num = argv[1]  # python3 does not count as argument
 
-    tasks_done = []
-    for task in todo:
+    user_query = {'id': num}  # this is added as query parameter
+    # that are appended to the endpoint URL
+    response_1 = requests.get("https://jsonplaceholder.typicode.com/users",
+                              params=user_query)  # endpoint URL
+
+    todo_query = {'userId': num}  # match todo list with user specified
+    response_2 = requests.get("https://jsonplaceholder.typicode.com/todos",
+                              params=todo_query)
+
+    user = response_1.json()  # .json() is a built in decoder
+    # from request module, returning a list of dictionaries
+
+    todo_list = response_2.json()
+
+    employee_name = user[0].get('name')  # retrieve value from given key
+
+    completed_tasks = 0
+    total_tasks = 0
+    completed_task_title = []
+
+    for task in todo_list:
         if task.get('completed') is True:
-            tasks_done.append(task.get('title'))
+            completed_task_title.append(task.get('title'))  # create list
+            # from completed tasks
+            completed_tasks += 1
+        total_tasks += 1
 
-    print("Employee {} is done with tasks({}/{}):".format(user.get('name'), len(tasks_done), len (todo)))
+    print("Employee {} is done with tasks({}/{}):"
+          .format(employee_name, completed_tasks, total_tasks))
+    for title in completed_task_title:
+        print('\t {}'.format(title))
 
-    for done in tasks_done:
-        print("\t {}".format(done))
+if __name__ == "__main__":
+    information_employee()

@@ -1,20 +1,26 @@
 #!/usr/bin/python3
-"""wrting an api script"""
+""" extend your Python script to export data in the CSV format """
 
-
-import csv
-from requests import get
+import requests
 from sys import argv
 
+def csv_format():
+    """exports data in csv format"""
+    
+    u_id = argv[1]
+    api_url = "https://jsonplaceholder.typicode.com/users/{}".format(u_id)
+    api_url2 = "https://jsonplaceholder.typicode.com/todos?userId={}"\
+        .format(u_id)
+    response = requests.get(api_url).json()
+    EMPLOYEE_NAME = response.get('username')
+    response = requests.get(api_url2).json()
+    f_name = u_id + '.csv'
+    with open(f_name, 'w', encoding='utf-8') as f:
+        for info in response:
+            TASK_COMPLETED_STATUS = info.get("completed")
+            TASK_TITLE = info.get("title")
+            f.write('"{}","{}","{}","{}"\n'.format(
+                u_id, EMPLOYEE_NAME, TASK_COMPLETED_STATUS, TASK_TITLE))
 
-if __name__ == "__main__":
-    url = 'https://jsonplaceholder.typicode.com/'
-    user_id = argv[1]
-    users = get('{}users/{}'.format(url, user_id)).json()
-    username = users.get('username')
-    tasks = get('{}todo?userId={}'.format(url, user_id)).json()
-    with open("{}.csv".format(user_id), 'wt') as file:
-        write_file = csv.writer(file, quoting=csv.QUOTE_ALL)
-        for task in tasks:
-            write_file.writerow([int(user_id), username,
-                                 task.get('completed'), task.get('title')])
+if __name__ == '__main__':
+    csv_format()
